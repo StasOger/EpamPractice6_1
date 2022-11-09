@@ -28,11 +28,35 @@ public class BookService {
             if(role.equals("admin")){
                 adminOperation();
             } else if (role.equals("user")) {
-
+                userOperation();
             }
         }
         catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void userOperation() throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        String choice = "";
+        String start = "Hi, User! \n"+
+                "- Enter \"1\" for show directory;\n" +
+                "for end enter \"exit\"\n";
+        System.out.println(start);
+        while (!choice.equalsIgnoreCase("exit")) {
+            System.out.print("Enter command: ");
+            choice = reader.readLine();
+            switch (choice) {
+                case "1":
+                    showDirectory();
+                    break;
+                case "exit":
+                    System.out.println("\nOver.");
+                    break;
+                default:
+                    System.out.println("Incorrect. Please repeat one more time.\n");
+
+            }
         }
     }
 
@@ -84,12 +108,65 @@ public class BookService {
         }
     }
 
-    private void showDirectory() {
-        List<Book> bookList = bookRepository.selectAllBooks();
-        for (Book b: bookList){
-            System.out.println(b);
+    private void showDirectory() throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        String choice = "";
+        String start ="- Enter \"1\" for open 1 page;\n" +
+                "- Enter \"2\" for open 2 page;\n" +
+                "- Enter \"3\" for open 3 page;\n" +
+                "for end enter \"exit\"\n";
+        System.out.println(start);
+        while (!choice.equalsIgnoreCase("exit")) {
+            System.out.print("Enter command: ");
+            choice = reader.readLine();
+            switch (choice) {
+                case "1":
+                    firstPage();
+                    break;
+                case "2":
+                    secondPage();
+                    break;
+                case "3":
+                    thirdPage();
+                    break;
+                case "exit":
+                    System.out.println("\nOver.");
+                    break;
+                default:
+                    System.out.println("Incorrect. Please repeat one more time.\n");
+
+            }
         }
     }
+
+    private void firstPage() {
+        List<Book> bookList = bookRepository.selectAllBooks();
+        for (Book b: bookList){
+            if (b.getId()>0 && b.getId()<10){
+                System.out.println(b);
+            }
+        }
+    }
+
+    private void secondPage() {
+        List<Book> bookList = bookRepository.selectAllBooks();
+        for (Book b: bookList){
+            if (b.getId()>=10 && b.getId()<20){
+                System.out.println(b);
+            }
+        }
+    }
+
+    private void thirdPage() {
+        List<Book> bookList = bookRepository.selectAllBooks();
+        for (Book b: bookList){
+            if (b.getId()>=20 && b.getId()<=30){
+                System.out.println(b);
+            }
+        }
+    }
+
+
 
     private void addBook() throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
