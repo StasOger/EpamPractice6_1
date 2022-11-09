@@ -110,24 +110,32 @@ public class BookService {
 
     private void showDirectory() throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        List<Book> bookList = bookRepository.selectAllBooks();
+        for (Book b: bookList){
+            if (b.getId()>0 && b.getId()<10){
+                System.out.println(b);
+            }
+        }
+        
         String choice = "";
-        String start ="- Enter \"1\" for open 1 page;\n" +
-                "- Enter \"2\" for open 2 page;\n" +
-                "- Enter \"3\" for open 3 page;\n" +
+        String start ="- Enter \"1\" for open after page;\n" +
+                "- Enter \"2\" for open next page;\n" +
                 "for end enter \"exit\"\n";
         System.out.println(start);
+        int counter = 0;
         while (!choice.equalsIgnoreCase("exit")) {
-            System.out.print("Enter command: ");
+            System.out.print("'1'after page      "+"  page №" +(counter+1)+"         next page'2' ");
+            System.out.println("counter" + counter);
             choice = reader.readLine();
             switch (choice) {
                 case "1":
-                    firstPage();
+                    counter--;
+                    changePage(counter);
                     break;
                 case "2":
-                    secondPage();
-                    break;
-                case "3":
-                    thirdPage();
+                    counter++;
+                    changePage(counter);
                     break;
                 case "exit":
                     System.out.println("\nOver.");
@@ -139,34 +147,15 @@ public class BookService {
         }
     }
 
-    private void firstPage() {
+    private void changePage(int counter) {
+
         List<Book> bookList = bookRepository.selectAllBooks();
         for (Book b: bookList){
-            if (b.getId()>0 && b.getId()<10){
+            if (b.getId()>(0+10*counter) && b.getId()<=(10+10*counter)){
                 System.out.println(b);
             }
         }
     }
-
-    private void secondPage() {
-        List<Book> bookList = bookRepository.selectAllBooks();
-        for (Book b: bookList){
-            if (b.getId()>=10 && b.getId()<20){
-                System.out.println(b);
-            }
-        }
-    }
-
-    private void thirdPage() {
-        List<Book> bookList = bookRepository.selectAllBooks();
-        for (Book b: bookList){
-            if (b.getId()>=20 && b.getId()<=30){
-                System.out.println(b);
-            }
-        }
-    }
-
-
 
     private void addBook() throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
