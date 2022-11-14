@@ -23,6 +23,10 @@ public class UserRepository {
         return null;
     }
 
+    public List<User>  getAllUsers (){
+        return readUsersFromCSV("src/main/resources/Users.csv");
+    }
+
     private static List<User> readUsersFromCSV(String fileName) {
         List<User> users = new ArrayList<>();
         Path pathToFile = Paths.get(fileName);
@@ -48,6 +52,7 @@ public class UserRepository {
         String role = metadata[1];
         String login = metadata[2];
         String password = metadata[3];
-        return new User(id, role, login, password);
+        String email = metadata[4];
+        return new User(id, role, login, password, email);
     }
 }

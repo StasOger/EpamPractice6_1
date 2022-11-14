@@ -14,6 +14,7 @@ import java.util.Scanner;
 public class BookService {
     private UserRepository userRepository = new UserRepository();
     private BookRepository bookRepository = new BookRepository();
+    private EmailService emailService = new EmailService();
 
     public void run(){
         try {
@@ -41,6 +42,7 @@ public class BookService {
         String choice = "";
         String start = "Hi, User! \n"+
                 "- Enter \"1\" for show directory;\n" +
+                "- Enter \"2\" for find book;\n" +
                 "for end enter \"exit\"\n";
         System.out.println(start);
         while (!choice.equalsIgnoreCase("exit")) {
@@ -50,12 +52,83 @@ public class BookService {
                 case "1":
                     showDirectory();
                     break;
+                case "2":
+                    findBook();
+                    break;
                 case "exit":
                     System.out.println("\nOver.");
                     break;
                 default:
                     System.out.println("Incorrect. Please repeat one more time.\n");
 
+            }
+        }
+    }
+
+    private void findBook() throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        String choice = "";
+        String start = "Hi, User! \n"+
+                "- Enter \"1\" for find book by name;\n" +
+                "- Enter \"2\" for find book by year;\n" +
+                "- Enter \"3\" for find book by author;\n" +
+                "for end enter \"exit\"\n";
+        System.out.println(start);
+        while (!choice.equalsIgnoreCase("exit")) {
+            System.out.print("Enter command: ");
+            choice = reader.readLine();
+            switch (choice) {
+                case "1":
+                    findBookByName();
+                    break;
+                case "2":
+                    findBookByYear();
+                    break;
+                case "3":
+                    findBookByAuthor();
+                    break;
+                case "exit":
+                    System.out.println("\nOver.");
+                    break;
+                default:
+                    System.out.println("Incorrect. Please repeat one more time.\n");
+
+            }
+        }
+    }
+
+    private void findBookByAuthor() {
+        System.out.println("Enter author: ");
+        Scanner in1 = new Scanner(System.in);
+        String bookAuthor = in1.nextLine();
+        List<Book> bookList = bookRepository.selectAllBooks();
+        for (Book b: bookList){
+            if (bookAuthor.equals(b.getAuthor())){
+                System.out.println(b);
+            }
+        }
+    }
+
+    private void findBookByYear() {
+        System.out.println("Enter author: ");
+        Scanner in1 = new Scanner(System.in);
+        int bookYear = in1.nextInt();
+        List<Book> bookList = bookRepository.selectAllBooks();
+        for (Book b: bookList){
+            if (bookYear == b.getYear()){
+                System.out.println(b);
+            }
+        }
+    }
+
+    private void findBookByName() {
+        System.out.println("Enter name: ");
+        Scanner in1 = new Scanner(System.in);
+        String bookName = in1.nextLine();
+        List<Book> bookList = bookRepository.selectAllBooks();
+        for (Book b: bookList){
+            if (bookName.equals(b.getName())){
+                System.out.println(b);
             }
         }
     }
@@ -110,10 +183,11 @@ public class BookService {
 
     private void showDirectory() throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        int counter = 0;
+        changePage(counter);
         String choice = "";
-        String start ="- Enter \"1\" for open 1 page;\n" +
-                "- Enter \"2\" for open 2 page;\n" +
-                "- Enter \"3\" for open 3 page;\n" +
+        String start ="- Enter \"1\" for open previous page;\n" +
+                "- Enter \"2\" for open next page;\n" +
                 "for end enter \"exit\"\n";
         System.out.println(start);
         while (!choice.equalsIgnoreCase("exit")) {
@@ -121,13 +195,12 @@ public class BookService {
             choice = reader.readLine();
             switch (choice) {
                 case "1":
-                    firstPage();
+                    counter--;
+                    changePage(counter);
                     break;
                 case "2":
-                    secondPage();
-                    break;
-                case "3":
-                    thirdPage();
+                    counter++;
+                    changePage(counter);
                     break;
                 case "exit":
                     System.out.println("\nOver.");
@@ -139,34 +212,14 @@ public class BookService {
         }
     }
 
-    private void firstPage() {
+    private void changePage(int counter) {
         List<Book> bookList = bookRepository.selectAllBooks();
         for (Book b: bookList){
-            if (b.getId()>0 && b.getId()<10){
+            if (b.getId()>=10*counter && b.getId()<10+10*counter){
                 System.out.println(b);
             }
         }
     }
-
-    private void secondPage() {
-        List<Book> bookList = bookRepository.selectAllBooks();
-        for (Book b: bookList){
-            if (b.getId()>=10 && b.getId()<20){
-                System.out.println(b);
-            }
-        }
-    }
-
-    private void thirdPage() {
-        List<Book> bookList = bookRepository.selectAllBooks();
-        for (Book b: bookList){
-            if (b.getId()>=20 && b.getId()<=30){
-                System.out.println(b);
-            }
-        }
-    }
-
-
 
     private void addBook() throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -182,8 +235,16 @@ public class BookService {
         int yearOfNewBook = in1.nextInt();
 
         List<Book> bookList = bookRepository.selectAllBooks();
+        List<User> userList = userRepository.getAllUsers();
 
         bookRepository.addBook(new Book(bookList.size()+1, bookNewName, bookNewAuthor, yearOfNewBook));
+
+        String message = ("Book added!"+bookNewName+" "+bookNewAuthor+" "+ yearOfNewBook);
+        for (User user: userList){
+            String email = user.getEmail();
+            emailService.sendEmail(email, message);
+        }
+
         System.out.println("Book added!");
     }
 
