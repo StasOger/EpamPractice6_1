@@ -8,19 +8,41 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Scanner;
 
 
 public class BookRepository {
 
     private static final String ADDRESS_FILE = "src/main/resources/Book.csv";
+    private static final String DELETED_FROM_FILE = "src/main/resources/Book.csv";
 
     public List<Book> selectAllBooks () {
         List<Book> books = readBooksFromCSV(ADDRESS_FILE);
 //        let's print all the person read from CSV file
         return books;
+    }
+
+    public void deleteBook(List<Book> bookList) {
+        try(FileWriter writer = new FileWriter(ADDRESS_FILE, false))
+        {
+            for (int i = 0; i < bookList.size(); i++) {
+                if (i!=0) {
+                    writer.append("\n");
+                }
+                Book book = bookList.get(i);
+                writer.append(String.valueOf(book.getId()));
+                writer.append(",");
+                writer.append(book.getName());
+                writer.append(",");
+                writer.append(book.getAuthor());
+                writer.append(",");
+                writer.append(String.valueOf(book.getYear()));
+            }
+            writer.flush();
+        }
+        catch(IOException ex){
+            System.out.println(ex.getMessage());
+        }
     }
 
     public void addBook (Book book) throws FileNotFoundException {
@@ -35,16 +57,11 @@ public class BookRepository {
             writer.append(",");
             writer.append(String.valueOf(book.getYear()));
 
-
             writer.flush();
         }
         catch(IOException ex){
             System.out.println(ex.getMessage());
         }
-    }
-
-    public void deleteBook (Book book){
-
     }
 
     private static List<Book> readBooksFromCSV(String fileName) {

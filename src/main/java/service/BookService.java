@@ -8,13 +8,14 @@ import role.User;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class BookService {
     private UserRepository userRepository = new UserRepository();
     private BookRepository bookRepository = new BookRepository();
-    private EmailService emailService = new EmailService();
+//    private EmailService emailService = new EmailService();
 
     public void run(){
         try {
@@ -167,6 +168,7 @@ public class BookService {
 
     private void deleteBook() {
         List<Book> bookList = bookRepository.selectAllBooks();
+        List<Book> newBookList = new ArrayList<>();
         for (Book b: bookList){
             System.out.println(b);
         }
@@ -175,10 +177,11 @@ public class BookService {
         Scanner in1 = new Scanner(System.in);
         int idOfDeletedBook = in1.nextInt();
         for (Book b: bookList){
-            if (b.getId() == idOfDeletedBook){
-                bookRepository.deleteBook(b);
+            if (b.getId() != idOfDeletedBook){
+                newBookList.add(b);
             }
         }
+        bookRepository.deleteBook(newBookList);
     }
 
     private void showDirectory() throws IOException {
@@ -242,7 +245,7 @@ public class BookService {
         String message = ("Book added!"+bookNewName+" "+bookNewAuthor+" "+ yearOfNewBook);
         for (User user: userList){
             String email = user.getEmail();
-            emailService.sendEmail(email, message);
+//            emailService.sendEmail(email, message);
         }
 
         System.out.println("Book added!");
